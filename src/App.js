@@ -3,6 +3,19 @@ import './App.css';
 import './Tablet.css';
 import AddTaskForm from "./AddTaskForm"
 
+import firebase from 'firebase';
+
+/* FIREBASE zum Speicher und in Echtzeit ändern der Objekte */
+const firebaseConfig = {
+  apiKey: "AIzaSyDvFcrd-owxZVH9B0PL-VOV6Nj3dfBoaXY",
+  authDomain: "mykanban-ca309.firebaseapp.com",
+  databaseURL: "https://mykanban-ca309.firebaseio.com",
+  projectId: "mykanban-ca309",
+  storageBucket: "mykanban-ca309.appspot.com",
+  messagingSenderId: "591706272817",
+  appId: "1:591706272817:web:3abb4bea6a283b8d3bd110"
+};
+
 
 export default function KanBan() {
 
@@ -160,9 +173,7 @@ export default function KanBan() {
     foundRelativeMousePositon = false
   }
 
-  function handleSlideTrigger(){
-    document.getElementById("done").classList.remove
-  }
+
 
   window.addEventListener("resize", () => {
     console.log(containerWidth)
@@ -172,12 +183,19 @@ export default function KanBan() {
     console.log("NPX_ " + difference)
 
     defaultTasklist[0].posX = (document.getElementById('backlog').offsetWidth - defaultTasklist[0].posX)
-    
+
     console.log("diff: " + difference)
     setContainerWidth(newWidth)
   })
 
+  function setNewTask(db) {
 
+  }
+
+  useEffect(() => {
+    // Firebase initialisieren
+    firebase.initializeApp(firebaseConfig);
+  }, [])
 
 
   // useEffect(() => {
@@ -185,7 +203,7 @@ export default function KanBan() {
   //   doneLeftBorder = document.getElementById('done').offsetLeft
   // }, [])
   // console.log({containerSize})
-  
+
   return (
 
     <div id="container">
@@ -199,9 +217,9 @@ export default function KanBan() {
         <div className="status" id="inProgress">
           <h3>In Progress</h3>
         </div>
-        <div className="slideInTrigger" onMouseOver={() => handleSlideTrigger() } ></div>
+        <div className="slideInTrigger" ></div>
         <div className="status slideInContent unshown" id="done">
-        <h3 class="slideInContent">Done</h3>
+          <h3 className="slideInContent">Done</h3>
         </div>
       </div>
 
@@ -243,7 +261,7 @@ export default function KanBan() {
 
         })
       }
-      
+
     </div>
     // {/* </div> */}
   )
