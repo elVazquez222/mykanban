@@ -12,8 +12,6 @@ export default function AddTaskForm(props) {
     event.target.value = ""
   }
 
- 
-
   function addBtnClick(){
     let title = document.getElementById("form_task_title").value
     let developer = document.getElementById("selectBearbeiter").value

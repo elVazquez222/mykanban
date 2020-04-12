@@ -1,0 +1,26 @@
+task 
+{
+  title: String,                    // Titel der Karte
+  posX: Number,                     // xKoordinate
+  posY: Number,                     // y Koordinate
+  assignedTo: Person,               // Bearbeitende Person
+  responsibleDepartment: String,    // zuständiger Fachbareich (zZt. group_dev|group_kollab|group_sharepoint)
+  status: String,                   // Backlog|inProgress|Done
+  dod: JSX,                         // HTML-Liste
+  onHold: boolean                   // true|false
+},
+//ohne Kommentare zum leichteren Kopieren: 
+{
+  title: String,                    
+  posX: Number,                     
+  posY: Number,                     
+  assignedToPerson: Person,         
+  responsibleDepartment: String,    
+  status: String,                   
+  dod: JSX,                         
+  onHold: boolean                   
+}
+
+
+// Diese Datei ist nirgendwo eingebunden. 
+// Sie dient lediglich als schematischen Skizze des Task-Objekts
