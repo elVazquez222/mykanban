@@ -190,9 +190,11 @@ body{
   box-shadow: 3px 3px 7px 0px rgba(0,0,0,0.75);
   font-family: 'Montserrat';
   cursor: pointer ;
-  width: 15%;
+  width: 21%;
+  max-width: 300px;
   z-index: 40;
   position: absolute;
+  min-width: 230px;
 }
 .group_dev{
   border-left: 4px solid lightskyblue;

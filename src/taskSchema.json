@@ -5,7 +5,7 @@ task
   posY: Number,                     // y Koordinate
   assignedTo: Person,               // Bearbeitende Person
   responsibleDepartment: String,    // zuständiger Fachbareich (zZt. group_dev|group_kollab|group_sharepoint)
-  status: String,                   // Backlog|inProgress|Done
+  status: String,                   // backlog|inProgress|done
   dod: JSX,                         // HTML-Liste
   onHold: boolean                   // true|false
 },
@@ -14,7 +14,7 @@ task
   title: String,                    
   posX: Number,                     
   posY: Number,                     
-  assignedToPerson: Person,         
+  assignedTo: Person,         
   responsibleDepartment: String,    
   status: String,                   
   dod: JSX,                         

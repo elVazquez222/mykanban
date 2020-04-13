@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import './Tablet.css';
+// import './Tablet.css';
 import AddTaskForm from "./AddTaskForm"
 
 import firebase from './firebase';
@@ -13,19 +13,28 @@ export default function KanBan() {
   const offsetTop = 101.4  // der Abstand des KanBanBoard-Containers zum oberen Fensterrand. Wird benötigt, um die Postionen richtig zu berechnen. Bsp event.pageY - 101.4  
 
 
-  function handleClick_addTask(title, developer, devGroup, dod) {
-
-    // progressLeftBorder = document.getElementById('inProgress').offsetLeft
-    // doneLeftBorder = document.getElementById('done').offsetLeft
-    let taskToAdd = { title: title, posX: 10, posY: 50, developer: developer, devGroup: devGroup, dod: "dod" }
-
-    // db.collection("tasks").add(taskToAdd)
-    //   .then(function (docRef) {
-    //     console.log("Document written with ID: ", docRef.id);
-    //   })
-    //   .catch(function (error) {
-    //     console.error("Error adding document: ", error);
-    //   })
+  function handleClick_addTask(title, assignedTo, responsibleDepartment, dod) {
+    firebase
+      .firestore()
+      .collection('tasks')
+      .add(
+        {
+          title,
+          posX: 100,
+          posY: 100,
+          assignedTo,
+          responsibleDepartment,
+          status: "backlog",
+          dod: "dod",
+          onHold: false
+        }
+      )
+      .then(ref => {
+        console.log(`Neue Karte "${ref.id}"  angelegt`)
+      })
+      .catch(err => {
+        console.log("Fehler beim Anlegen der Karte: ", err)
+      })
   }
 
   function click_cta_btn() {
@@ -126,25 +135,35 @@ export default function KanBan() {
 
   function setNewPosition(event, id) {
     event.preventDefault()
-    // console.log(relativePositionXY.x)
     let newPosX = event.pageX - relativePositionXY.x
     let newPosY = event.pageY - offsetTop - relativePositionXY.y
-    let newTasklist =
-      tasklist.map(task => {
-        if (task.id === id) {
-          return { id: id, title: task.title, posX: newPosX, posY: newPosY, developer: task.developer, devGroup: task.responsibleDepartment, dod: task.dod }
-        } else {
-          return task
-        }
+
+    firebase
+      .firestore()
+      .collection('tasks')
+      .doc(id)
+      .update({
+        posX: newPosX,
+        posY: newPosY
       })
-    console.log(`Task ${event.target.id} wurde verschoben auf Position ${newPosX} : ${newPosY}`)
-    setTasklist(newTasklist)
     let task = document.getElementById(id)
     setTimeout(() => {
       task.style.display = "unset"
     }, 1)
-
     foundRelativeMousePositon = false
+
+    console.log(`Task ${event.target.id} wurde verschoben auf Position ${newPosX} : ${newPosY}`)
+
+    // let newTasklist =
+    //   tasklist.map(task => {
+    //     if (task.id === id) {
+    //       return { id: id, title: task.title, posX: newPosX, posY: newPosY, developer: task.developer, devGroup: task.responsibleDepartment, dod: task.dod }
+    //     } else {
+    //       return task
+    //     }
+    //   })
+    // setTasklist(newTasklist)
+    
   }
 
 
@@ -170,7 +189,9 @@ export default function KanBan() {
   //   progressLeftBorder = document.getElementById('inProgress').offsetLeft
   //   doneLeftBorder = document.getElementById('done').offsetLeft
   // }, [])
-  console.log(tasklist)
+  useEffect(() => {
+
+  }, [])
 
   return (
 
@@ -207,7 +228,7 @@ export default function KanBan() {
               <div className="task-header">
                 <div className="task-topline">
                   <span className="task-Title">{`${task.title}`}</span>
-                  {/* <span className="task-Id">{`${task.id}`}</span> */}
+                  {/* <span className="task-Id">{`${ task.id }`}</span> */}
                 </div>
 
                 <div className="task-Developer">

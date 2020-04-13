@@ -14,7 +14,7 @@ export default function AddTaskForm(props) {
 
   function addBtnClick(){
     let title = document.getElementById("form_task_title").value
-    let developer = document.getElementById("selectBearbeiter").value
+    let assignedTo = document.getElementById("selectBearbeiter").value
     let dodlist = (<ul>{dodList.map((dod, index) => {
       return (
         <li key={index}>
@@ -22,7 +22,7 @@ export default function AddTaskForm(props) {
         </li>
       )
     })}</ul>)
-    props.handleClick_addTask(title, developer, devGroupOption, dodlist)
+    props.handleClick_addTask(title, assignedTo, devGroupOption, dodlist)
     clearFormData()
   }
   function closeFormClick(){
