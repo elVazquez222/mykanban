@@ -241,6 +241,9 @@ body{
 .task-header{
   padding: .4em
 }
+.task-header-right{
+  display: none; 
+}
 .task-topline{
   display: flex;
   justify-content: space-between;
@@ -296,7 +299,10 @@ body{
   border-radius: 4px;
   padding: 2px 5px;
   margin-left: auto;
-  max-height: 16px
+  max-height: 16px;
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
 }
 
 /* DRAG & DROP Kram */
@@ -324,4 +330,39 @@ body{
       content: 'Kanban';
       font-size: 11.5em;
     }
+} 
+@media only screen 
+  and (min-width: 2000px) { 
+    .task{
+      width: 400px;
+      height: 58px;
+    }
+
+/* .hideDescOverflow wird dynamisch bei Klick auf den i Button hinzugefügt/entfernt*/
+    .descriptionPreview{
+      overflow: hidden; 
+      height: 50px;
+    }
+    #kbTitle:after{
+      content: 'Kanban';
+      font-size: 11.5em;
+    }
+    .task-header{
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .task-header-right{
+      display: unset;
+      font-size: .75em;
+      width: 45%;
+      opacity: .7;
+    }
+    .task-Details{
+      line-height: 1.3em;
+    }
+    .details-expand-btn{
+      /* display: none */
+    }
+
 } 
