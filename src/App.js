@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 // import './Tablet.css';
 import AddTaskForm from "./AddTaskForm"
+import TooSmall from "./TooSmall"
 
 import firebase from './firebase';
 
@@ -9,9 +10,18 @@ export default function KanBan() {
 
   const [tasklist, setTasklist] = useState([])
   const [relativePositionXY, setRelativePositionXY] = useState()
+
+  const [backlogAnkerLeftPos, setBacklogAnkerLeftPos] = useState()
+  const [backlogAnkerRightPos, setBacklogAnkerRightPos] = useState()
+  const [inProgressAnkerLeftPos, setInProgressAnkerLeftPos] = useState()
+  const [inProgressAnkerRightPos, setInProgressAnkerRightPos] = useState()
+  const [statusBorder, setStatusBorder] = useState()
+  
+  const [isWidthBelowMinimum, setIsWidthBelowMinimum] = useState(false)
+  const windowWidthMinimum = 1000
+
   let foundRelativeMousePositon = false
   const offsetTop = 101.4  // der Abstand des KanBanBoard-Containers zum oberen Fensterrand. Wird benötigt, um die Postionen richtig zu berechnen. Bsp event.pageY - 101.4  
-
 
   function handleClick_addTask(title, assignedTo, responsibleDepartment, dod) {
     firebase
@@ -68,6 +78,10 @@ export default function KanBan() {
   //   // statusAfterMovement != " Backlog" ? (statusAfterMovement === " inProgress" ? event.target.classList.add("progress") : event.target.classList.add("done") )  : (event.target.classList.remove("progress", "done"))
   // }
 
+/*
+Die Karte beim Beginn eines Drag-Vorgangs (ziehen) an der alten Postionion ausblenden und erst wieder einblenden,
+    sobald der Vorgang abgeschlossen ist (an der neuen Psoition).
+*/
   function detail_toggle(id) {
     let task = document.getElementById(id);
     if (task.style.display === "none") {
@@ -77,24 +91,7 @@ export default function KanBan() {
     }
   }
 
-  // erkennen, ob der User vermutlich draggen will, um die Karte gezielt unter dem Mauszeiger auszurichten. 
-  // (sonst "landet" die Karte nicht da, wo man es erwartet)
-  // function willDrag(event, id) {
-  //   event.preventDefault()
-  //   let newPosX = event.pageX
-  //   let newPosY = event.pageY - offsetTop
-  //     let newTasklist =
-  //       tasklist.map(task => {
-  //         if (task.id === id) {
-  //           return { id: id, posX: newPosX, posY: newPosY }
-  //         } else {
-  //           return task
-  //         }
-  //     setTasklist(newTasklist)
-  //   }, 700)
-  // }
   function dragging(event, id) {
-    // e.preventDefault()
     let newPosX = event.pageX
     let newPosY = event.pageY - offsetTop
     let newTasklist = tasklist.map(task => {
@@ -108,7 +105,7 @@ export default function KanBan() {
     let task = document.getElementById(id)
     setTimeout(() => {
       task.style.display = "none"
-    }, 1)
+    }, .1)
   }
 
   function taskClicked(event, id) {
@@ -117,8 +114,10 @@ export default function KanBan() {
     }
   }
   function relativePosition(event, taskId) {
-    // die relative Position des Mauszeigers auf der KanBan-Karte ermitteln
-    // ,um die richtige Position zum Ablegen der Karte berechnen zu können
+    /*  
+    Die relative Position des Mauszeigers auf der KanBan-Karte ermitteln
+        ,um die richtige Position zum Ablegen der Karte berechnen zu können
+    */
     let task = document.getElementById(taskId)
     let absolutePositionMauszeigerX = event.pageX
     let absolutePositionMauszeigerY = event.pageY - offsetTop // der Container beginnt 101.4px (offsetTop) unter y=0 TODO: Hier absolute durch berechnete Werte ersetzen
@@ -126,17 +125,40 @@ export default function KanBan() {
     let positionKarteY = task.offsetTop
     let relativePositionMauszeigerX = absolutePositionMauszeigerX - positionKarteX
     let relativePositionMauszeigerY = absolutePositionMauszeigerY - positionKarteY
-    // console.log(relativePositionMauszeigerX)
-    // console.log(relativePositionMauszeigerY) 
     setRelativePositionXY({ x: relativePositionMauszeigerX, y: relativePositionMauszeigerY })
-    // console.log(relativePositionXY)
     foundRelativeMousePositon = true
   }
 
   function setNewPosition(event, id) {
+
+    /*  
+    Neue Postion an den "Ankern" ausrichten 
+        Die Anker sind "unsichtbare" Div-Element, die durch ein flex-Lauyout
+        Ihre Position relativ responsive innerhalb der jeweiligen Spalte (Backlog|inProgress)
+        halten. Beim Window-Event .onresize, wie die absolute Position dieser Anker im
+        State  aktualisiert (offsetLeft/px).
+        Durch relatives Ausrichten der Karten (Tasks) anhand der responsiven Anker, wird
+        das Design insgesamt responsive. ..hoffe ich 
+    */
     event.preventDefault()
     let newPosX = event.pageX - relativePositionXY.x
     let newPosY = event.pageY - offsetTop - relativePositionXY.y
+    /*
+    Mehrteilige Prüfung:
+      Falls die neue Position (gemessen an der oberen linken Ecke) der Karte LINKS von "InProgress" ist, 
+          dann 
+            prüfe, ob sie links von der linken Backlock Spalte ist. Wenn ja, setze "backlogLeft", sonst setze "backlogRight"
+          sonst
+            die gleiche Prüfart für die inProgress-Spalten und setze entsprechend "inProgressLeft" oder "inProgressRight"
+      Beim Mappen .map() der Tasklsite wird auf den jeweiligen spalten-Namen geprüft und dementsprechen die x-Position angepasst.
+      Siehe switchCase im Return-Bereich
+    */
+    let spalte = newPosX - statusBorder < 0 ? (newPosX - backlogAnkerLeftPos < 0 ? "backlogLeft" : "backlogRight")
+                                            : (newPosX - inProgressAnkerLeftPos < 0 ? "inProgressLeft" : "inProgressRight")
+
+    console.log("Konsole:", newPosX )
+    console.log("Konsole:", inProgressAnkerLeftPos)
+    console.log("Konsole:", newPosX - inProgressAnkerLeftPos)
 
     firebase
       .firestore()
@@ -144,7 +166,8 @@ export default function KanBan() {
       .doc(id)
       .update({
         posX: newPosX,
-        posY: newPosY
+        posY: newPosY,
+        spalte
       })
     let task = document.getElementById(id)
     setTimeout(() => {
@@ -154,20 +177,13 @@ export default function KanBan() {
 
     console.log(`Task ${event.target.id} wurde verschoben auf Position ${newPosX} : ${newPosY}`)
 
-    // let newTasklist =
-    //   tasklist.map(task => {
-    //     if (task.id === id) {
-    //       return { id: id, title: task.title, posX: newPosX, posY: newPosY, developer: task.developer, devGroup: task.responsibleDepartment, dod: task.dod }
-    //     } else {
-    //       return task
-    //     }
-    //   })
-    // setTasklist(newTasklist)
-    
   }
 
 
-
+/*
+Verbindung zur Datenbank
+  aufbauen. Dabei: Verbindung beenden(unsubscribe), sobald das Fenster geschlossen wird.
+*/
   useEffect(() => {
     const unsubscribe =
       firebase
@@ -179,21 +195,62 @@ export default function KanBan() {
             ...task.data()
           }))
           setTasklist(tasksFromDB)
-          console.log(tasksFromDB)
         })
     return () => unsubscribe()
   }, [])
 
 
-  // useEffect(() => {
-  //   progressLeftBorder = document.getElementById('inProgress').offsetLeft
-  //   doneLeftBorder = document.getElementById('done').offsetLeft
-  // }, [])
+  /*  
+  Positionen der ANKER Elemente initial (onMount) setzen.
+      Ankerelement dienen als Orientierung in welchem Bereich (Spalte) eine Karte abgelegt wurde.
+      Sie verhalten sich responsive.
+      Um die Karten anzuordnen, wird bei jedem resize-Event die absolute Position der Anker neu ermittelt.
+      So können die Karten, deren Positionen ebenfalls als absolute Werte gespeicher werden, immer
+      relativ zu den Ankern ausgerichtet werden, wodurch ihre Positionierung ebenfalls responsive wird.
+      Denke ich.. 
+      Um die Anker sichtbar zu machen, in der App.css die .anker(...) Elemente finden und die border-
+      Angaben wieder einkommentieren. 'statusBorder' ist die Grenze zwischen Backlog und InProgress.
+  */
   useEffect(() => {
 
+    const ankerBacklogLeft = document.getElementById('ankerBacklogLeft')
+    const ankerBacklogRight = document.getElementById('ankerBacklogRight')
+    const ankerInProgressLeft = document.getElementById('ankerInProgressLeft')
+    const ankerInProgressRight = document.getElementById('ankerInProgressRight')
+    const statusBorder = document.getElementById('inProgress')
+
+    setBacklogAnkerLeftPos(ankerBacklogLeft.offsetLeft)
+    setBacklogAnkerRightPos(ankerBacklogRight.offsetLeft)
+    setInProgressAnkerLeftPos(ankerInProgressLeft.offsetLeft * 4)
+    setInProgressAnkerRightPos(ankerInProgressRight.offsetLeft * 2.5)
+    setStatusBorder(statusBorder.offsetLeft)
+
+
+    window.addEventListener('resize', () => {
+      setBacklogAnkerLeftPos(ankerBacklogLeft.offsetLeft)
+      setBacklogAnkerRightPos(ankerBacklogRight.offsetLeft)
+      setInProgressAnkerLeftPos(ankerInProgressLeft.offsetLeft)
+      setInProgressAnkerRightPos(ankerInProgressRight.offsetLeft)
+      setStatusBorder(statusBorder.offsetLeft)
+      window.location.reload()
+    })
   }, [])
+  /*
+  Minimal Bildschirm-Auflösung prüfen.
+    Falls die aktuelle Auflösung zu gering ist, um das KanBanNoard darzustellen, die Variable
+    isSolution isSolutionBelowLimit auf true setzen.
+  */
+  useEffect(() => {
+    setIsWidthBelowMinimum(window.innerWidth < windowWidthMinimum)
+    window.addEventListener('resize', () => {
+      setIsWidthBelowMinimum(window.innerWidth < windowWidthMinimum)
+    })
+  }, [])
+  
+  // console.log(backlogAnkerLeftPos)
 
   return (
+    isWidthBelowMinimum ? <TooSmall /> :
 
     <div id="container">
 
@@ -202,18 +259,49 @@ export default function KanBan() {
       <div id="container_allStatus">
         <div className="status" id="backlog">
           <h3>Backlog</h3>
-          <div id="addTask-btn" onClick={() => click_cta_btn()}><strong>+</strong> </div></div>
+          <div id="addTask-btn" onClick={() => click_cta_btn()}><strong>+</strong> </div>
+          <div className="ankerContainer" id="ankerContainerBacklog">
+            <div className="ankerBacklog left" id="ankerBacklogLeft"></div>
+            <div className="ankerBacklog right" id="ankerBacklogRight"></div>
+          </div>
+        </div>
         <div className="status" id="inProgress">
           <h3>In Progress</h3>
+          <div className="ankerContainer" id="ankerContainerInProgress">
+            <div className="ankerInProgress left" id="ankerInProgressLeft"></div>
+            <div className="ankerInProgress right" id="ankerInProgressRight"></div>
+          </div>
         </div>
-        <div className="slideInTrigger" ></div>
-        <div className="status slideInContent unshown" id="done">
+
+        {/* <div className="slideInTrigger" ></div>
+        <div className="status slideInContent unshown" id="done">Done
           <h3 className="slideInContent">Done</h3>
-        </div>
+        </div> */}
       </div>
 
       {
         tasklist.map(task => {
+          let leftPos = 0
+          let consoleLogText = ""
+          switch (task.spalte) {
+            case "backlogLeft":
+              leftPos = backlogAnkerLeftPos - 150
+              consoleLogText = "backlogAnkerLeftPos"
+              break;
+            case "backlogRight":
+              leftPos = backlogAnkerRightPos - 75
+              consoleLogText = "backlogAnkerRightPos"
+              break;
+            case "inProgressLeft":
+              leftPos = inProgressAnkerLeftPos -150
+              consoleLogText = "inProgressAnkerLeftPos"
+              break;
+            case "inProgressRight":
+              leftPos = inProgressAnkerRightPos - 75
+              consoleLogText = "inProgressAnkerRightPos"
+              break;
+          }
+          // console.log("SwitchCase: " +consoleLogText)
           return (
             <div
               id={task.id}
@@ -223,7 +311,7 @@ export default function KanBan() {
               onDrag={event => dragging(event, task.id)}
               onDragEnd={event => { setNewPosition(event, task.id) }}
               onMouseDown={event => taskClicked(event, task.id)}
-              style={{ left: task.posX, top: task.posY }}
+              style={{ left: leftPos, top: task.posY }}
             >
               <div className="task-header">
                 <div className="task-topline">
