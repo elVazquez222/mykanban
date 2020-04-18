@@ -15,14 +15,14 @@ export default function AddTaskForm(props) {
   function addBtnClick(){
     let title = document.getElementById("form_task_title").value
     let assignedTo = document.getElementById("selectBearbeiter").value
-    let dodlist = (<ul>{dodList.map((dod, index) => {
-      return (
-        <li key={index}>
-          {dod}
-        </li>
-      )
-    })}</ul>)
-    props.handleClick_addTask(title, assignedTo, devGroupOption, dodlist)
+    // let dodlist = (<ul>{dodList.map((dod, index) => {
+    //   return (
+    //     <li key={index}>
+    //       {dod}
+    //     </li>
+    //   )
+    // })}</ul>)
+    props.handleClick_addTask(title, assignedTo, devGroupOption, dodList)
     clearFormData()
   }
   function closeFormClick(){

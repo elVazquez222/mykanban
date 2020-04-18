@@ -1,0 +1,14 @@
+.dodChecklist{
+  display: flex;
+  flex-direction: column;
+  margin-top: 1em;
+}
+.dodChecklist__Entry{
+  margin: unset;
+  line-height: 1.5em;
+  margin-right: 10px;
+  padding: 0 5px;
+}
+.dodChecklist__Entry:nth-child(odd){
+  background: rgb(245, 245, 245);
+}

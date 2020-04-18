@@ -3,6 +3,7 @@ import './App.css';
 // import './Tablet.css';
 import AddTaskForm from "./AddTaskForm"
 import TooSmall from "./TooSmall"
+import DODList from "./DODList"
 
 import firebase from './firebase';
 
@@ -15,6 +16,7 @@ export default function KanBan() {
   const [backlogAnkerRightPos, setBacklogAnkerRightPos] = useState()
   const [inProgressAnkerLeftPos, setInProgressAnkerLeftPos] = useState()
   const [inProgressAnkerRightPos, setInProgressAnkerRightPos] = useState()
+  const [countTasks, setCountTasks] = useState({backlog: [], inProgress: []})
   const [statusBorder, setStatusBorder] = useState()
   
   const [isWidthBelowMinimum, setIsWidthBelowMinimum] = useState(false)
@@ -24,7 +26,8 @@ export default function KanBan() {
   const offsetTop = 101.4  // der Abstand des KanBanBoard-Containers zum oberen Fensterrand. Wird benötigt, um die Postionen richtig zu berechnen. Bsp event.pageY - 101.4  
 
   function handleClick_addTask(title, assignedTo, responsibleDepartment, dod) {
-    firebase
+    console.log(dod)
+    const unsubscribe = firebase
       .firestore()
       .collection('tasks')
       .add(
@@ -35,7 +38,7 @@ export default function KanBan() {
           assignedTo,
           responsibleDepartment,
           status: "backlog",
-          dod: "dod",
+          dod,
           onHold: false
         }
       )
@@ -45,6 +48,7 @@ export default function KanBan() {
       .catch(err => {
         console.log("Fehler beim Anlegen der Karte: ", err)
       })
+    return () => unsubscribe()
   }
 
   function click_cta_btn() {
@@ -161,14 +165,15 @@ Die Karte beim Beginn eines Drag-Vorgangs (ziehen) an der alten Postionion ausbl
     console.log("Konsole:", inProgressAnkerLeftPos)
     console.log("Konsole:", newPosX - inProgressAnkerLeftPos)
 
-    firebase
+    const unsubscribe = firebase
       .firestore()
       .collection('tasks')
       .doc(id)
       .update({
         posX: newPosX,
         posY: newPosY,
-        spalte
+        spalte,
+        status: newPosX - statusBorder < 0 ? "backlog" : "inProgress"
       })
     let task = document.getElementById(id)
     setTimeout(() => {
@@ -178,6 +183,7 @@ Die Karte beim Beginn eines Drag-Vorgangs (ziehen) an der alten Postionion ausbl
 
     console.log(`Task ${event.target.id} wurde verschoben auf Position ${newPosX} : ${newPosY}`)
 
+    return () => unsubscribe()
   }
 
 
@@ -191,10 +197,12 @@ Verbindung zur Datenbank
         .firestore()
         .collection('tasks')
         .onSnapshot(snap => {
-          const tasksFromDB = snap.docs.map(task => ({
-            id: task.id,
-            ...task.data()
-          }))
+          const tasksFromDB = snap.docs.map(task =>{
+            return ({
+              id: task.id,
+              ...task.data()
+            })
+          } )
           setTasklist(tasksFromDB)
         })
     return () => unsubscribe()
@@ -248,7 +256,7 @@ Verbindung zur Datenbank
     })
   }, [])
   
-  // console.log(backlogAnkerLeftPos)
+  console.log({countTasks})
 
   return (
     isWidthBelowMinimum ? <TooSmall /> :
@@ -332,15 +340,13 @@ Verbindung zur Datenbank
                   </div>
                 </div>
                 
-                <span className="details-expand-btn" onClick={() => detail_toggle(`details_${task.id}`, task.id)} onDrag={event => dragging(event, task.id)}>i</span>
+                <span className="details-expand-btn" onClick={() => detail_toggle(`details_${task.id}`, task.id)} onDrag={event => dragging(event, task.id)}>↕</span>
               </div>
               <div className={`task-Details`} id={`details_${task.id}`}>
                 Definition of Done:
-                  <ul>
-                  {
-                    task.dod
-                  }
-                </ul>
+                  
+                <DODList dod={task.dod} />
+                    
               </div>
             </div>
           )
