@@ -364,5 +364,8 @@ body{
     .details-expand-btn{
       /* display: none */
     }
-
+    #kbTitle:after{
+      content: 'Kanban';
+      font-size: 13.5em;
+    }
 } 

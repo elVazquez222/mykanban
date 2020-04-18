@@ -2,7 +2,7 @@ import React from 'react'
 
 export default function TooSmall() {
   return (
-    <div style={{display: "grid", textAlign: "center", placeContent: "center", padding: "2em", width: "70%", marginLeft: "15%"}}>
+    <div style={{display: "grid", textAlign: "center", placeContent: "center", padding: "2em", width: "70%", margin: "0 auto"}}>
       <div style={{}}>
         <h3>Auflösung zu klein</h3>
         <p style={{lineHeight: "1.2em"}}>Diese Webseite kann nur ab einer Auflösung von mindestens <b>1000px</b> (Breite) genutzt werden.<br />
