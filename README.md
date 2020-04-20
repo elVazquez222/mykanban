@@ -1,3 +1,11 @@
+In Corona times i built up this draft project of a digital KanBan Board. 
+It is meant to serve as the basis for our team to stick to the accustomed weekly 
+KanBan sessions even though everybody is working in HomeOffice.
+
+The Project is built with React Hooks.
+To store the data and update Chages in REAL TIME on all devices, that are displaying
+the KanBan Board, a firebase datastore is connected. 
+
 ![](mykanbangif.gif)
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
