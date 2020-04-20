@@ -5,7 +5,7 @@
   position: absolute;
   left: 35%;
   top: 150px;
-  padding: 2em; 
+  padding: 5em; 
   min-height: 420px; 
   width: 400px;
   /* border: 2px solid rgba(200, 210, 210, 1); */
@@ -29,22 +29,28 @@
 .form_task{
   width: 80%;
   border: 1px solid rgba(0,0,0,0.25);
-  box-shadow: 3px 3px 7px 0px rgba(0,0,0,0.75);
+  box-shadow: 3px 3px 7px 0px rgba(0,0,0,0.15);
   font-family: 'Montserrat';
   display: flex;
   flex-direction: column;
   z-index: 40;
+  padding: 1.29em; 
   /* border-left: 3px solid lightskyblue; */
-  /* position: absolute; */
+  position: relative;
+  transition: all ease-out;
+  transition-duration: 1s;
 }
 .group_dev{
-  border-left: 4px solid lightskyblue;
+  /* border-left: 4px solid lightskyblue; */
+  border-top: 5px solid lightskyblue;
 }
 .group_kollab{
-  border-left: 4px solid  mediumblue;
+  /* border-left: 4px solid  mediumblue; */
+  border-top: 4px solid  mediumblue;
 }
 .group_sharepoint{
-  border-left: 4px solid #986405;
+  /* border-left: 4px solid #986405; */
+  border-top: 4px solid #986405;
 }
 
 .form_col_left{
@@ -52,7 +58,10 @@
   display: flex;
   justify-content: space-between;
   font-size: .7em;
-  color: white
+  color: white;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 .abteilung{
 width: stretch;
@@ -120,6 +129,9 @@ input[type=text], select, textarea, .form_task-Developer_default {
   border: none;
   box-shadow: 0px 4px 5px -5px rgba(38,38,155,0.75);
   /* padding: 1em; */
+}
+.selectBearbeiter{
+  width: 100%;
 }
 .form_task-Developer_default {
   width: 25px;
