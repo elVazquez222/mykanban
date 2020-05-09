@@ -12,3 +12,6 @@
 .dodChecklist__Entry:nth-child(odd){
   background: rgb(245, 245, 245);
 }
+.dodChecklist__Entry{
+  font-size: .9em;
+}

@@ -8,7 +8,7 @@ export default function DODList(props){
   <div className="dodChecklist">
     {dod.map(dod => {
       return(
-      <div className="dodChecklist__Entry">
+      <div className="dodChecklist__Entry" key={dod}>
         {/* <input type="checkbox" key={dod} name={dod} value={dod} />
         <labe for={dod}>{dod}</labe> */}
         <p>{dod}</p>

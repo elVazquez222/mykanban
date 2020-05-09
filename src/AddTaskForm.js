@@ -37,10 +37,11 @@ export default function AddTaskForm(props) {
     , die dann in das SELECT Feld gemapt werden users.map()
   */
   useEffect(() => {
-    for (let i = 5; i >= 0; i--) {
-      fetch("https://randomuser.me/api/")
-        .then(res => res.json())
-        .then(res => {
+
+    fetch("https://randomuser.me/api/?nat=au&results=6")
+      .then(res => res.json())
+      .then(res => {
+        for (let i = 5; i >= 0; i--) {
           let fullName = res.results[0].name.title + " " + res.results[0].name.first + " " + res.results[0].name.last
           let picture = res.results[0].picture.thumbnail
           setUsers(prev => {
@@ -49,67 +50,67 @@ export default function AddTaskForm(props) {
           setUserPics(prev => {
             return [...prev, picture]
           })
-        })
-    }
+        }
+      })
   }, [])
-  return (
-    <div className="addTaskForm" id="addTaskForm">
-      <h1>Neue Karte erzeugen</h1>
+return (
+  <div className="addTaskForm" id="addTaskForm">
+    <h1>Neue Karte erzeugen</h1>
 
-      <div className={`form_task ${devGroupOption}`} >
+    <div className={`form_task ${devGroupOption}`} >
 
-        <div className="form_col_left">
-          <div className="form_dev abteilung" onClick={() => setDevGroupOption("group_dev")} >Dev</div>
-          <div className="form_kollab abteilung" onClick={() => setDevGroupOption("group_kollab")} >Kollab</div>
-          <div className="form_sharepoint abteilung" onClick={() => setDevGroupOption("group_sharepoint")} >Sharepoint</div>
-        </div>
-        <div className="form_task-header">
-          <span className="form_task-Title">
-            <input type="text" id="form_task_title" name="task_title" placeholder="Titel der Karte" />
-          </span>
-          <div className="form_task-Developer">
-            <select className="selectBearbeiter" id="selectBearbeiter">
+      <div className="form_col_left">
+        <div className="form_dev abteilung" onClick={() => setDevGroupOption("group_dev")} >Dev</div>
+        <div className="form_kollab abteilung" onClick={() => setDevGroupOption("group_kollab")} >Kollab</div>
+        <div className="form_sharepoint abteilung" onClick={() => setDevGroupOption("group_sharepoint")} >Sharepoint</div>
+      </div>
+      <div className="form_task-header">
+        <span className="form_task-Title">
+          <input type="text" id="form_task_title" name="task_title" placeholder="Titel der Karte" />
+        </span>
+        <div className="form_task-Developer">
+          <select className="selectBearbeiter" id="selectBearbeiter">
 
-              {
-                users.map(name => {
-                  return (
-                  <option>
+            {
+              users.map((name, index) => {
+                return (
+                  <option key={index}>
                     {name}
                   </option>
-                  )
-                })
-              }
-            </select>
-          </div>
-        </div>
-
-
-        <div className="form_task-Details" style={{ display: "block" }}
-        //  id={`details_${task.id}`}
-        >
-          <span className="form_d-o-d-title">
-            Definition of Done:
-          </span>
-          <span className="form_d-o-d-list">
-            <input type="text" id="form_task_dod" name="task_dod" onKeyDown={event => event.which === 13 && addDod(event, event.target.value)} placeholder="Akzeptanzkriterium" />
-          </span>
-          <ul>
-            {
-              dodList.map((dod, index) => {
-                return (
-                  <li key={index}  >
-                    {dod}
-                  </li>
                 )
               })
             }
-          </ul>
-
+          </select>
         </div>
       </div>
-      <div className="form_cta_btn" onClick={() => addBtnClick()} >hinzufügen</div>
-      <span className="close_btn" onClick={() => closeFormClick()} >abbrechen</span>
+
+
+      <div className="form_task-Details" style={{ display: "block" }}
+      //  id={`details_${task.id}`}
+      >
+        <span className="form_d-o-d-title">
+          Definition of Done:
+          </span>
+        <span className="form_d-o-d-list">
+          <input type="text" id="form_task_dod" name="task_dod" onKeyDown={event => event.which === 13 && addDod(event, event.target.value)} placeholder="Akzeptanzkriterium" />
+        </span>
+        <ul>
+          {
+            dodList.map((dod, index) => {
+              return (
+                <li key={index}  >
+                  {dod}
+                </li>
+              )
+            })
+          }
+        </ul>
+
+      </div>
     </div>
-  )
+    <div className="form_cta_btn" onClick={() => addBtnClick()} >hinzufügen</div>
+    <span className="close_btn" onClick={() => closeFormClick()} >abbrechen</span>
+  </div>
+)
 
 }

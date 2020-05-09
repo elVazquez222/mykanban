@@ -19,6 +19,7 @@ export default function KanBan() {
   const [countTasks, setCountTasks] = useState({backlog: [], inProgress: []})
   const [statusBorder, setStatusBorder] = useState()
   
+
   const [isWidthBelowMinimum, setIsWidthBelowMinimum] = useState(false)
   const windowWidthMinimum = 1000
 
@@ -98,11 +99,14 @@ Die Karte beim Beginn eines Drag-Vorgangs (ziehen) an der alten Postionion ausbl
   }
 
   function dragging(event, id) {
+    // console.log("pageX: " +  event.pageX)
+    // console.log("clientX: " + event.clientX)
+    // console.log("offsetLeft: " + event.target.offsetLeft)
     let newPosX = event.pageX
     let newPosY = event.pageY - offsetTop
     let newTasklist = tasklist.map(task => {
       if (task.id === id) {
-        return { id: id, title: task.title, posX: newPosX, posY: newPosY, developer: task.developer, devGroup: task.devGroup, dod: task.dod }
+        return { id: id, key: id, title: task.title, posX: newPosX, posY: newPosY, developer: task.developer, devGroup: task.devGroup, dod: task.dod }
       } else {
         return task
       }
@@ -162,8 +166,6 @@ Die Karte beim Beginn eines Drag-Vorgangs (ziehen) an der alten Postionion ausbl
     let spalte = newPosX - statusBorder < 0 ? (newPosX - backlogAnkerLeftPos < 0 ? "backlogLeft" : "backlogRight")
                                             : (newPosX - inProgressAnkerLeftPos < 0 ? "inProgressLeft" : "inProgressRight")
 
-  
-
     const unsubscribe = firebase
       .firestore()
       .collection('tasks')
@@ -180,7 +182,7 @@ Die Karte beim Beginn eines Drag-Vorgangs (ziehen) an der alten Postionion ausbl
     }, 1)
     foundRelativeMousePositon = false
 
-    console.log(`Task ${event.target.id} wurde verschoben auf Position ${newPosX} : ${newPosY}`)
+    console.log(`Task ${event.target.id} Position verschoben nach ${newPosX} : ${newPosY}`)
 
     return () => unsubscribe()
   }
@@ -199,6 +201,7 @@ Verbindung zur Datenbank
           const tasksFromDB = snap.docs.map(task =>{
             return ({
               id: task.id,
+              key: task.id,
               ...task.data()
             })
           } )
@@ -255,11 +258,9 @@ Verbindung zur Datenbank
     })
   }, [])
   
-  // console.log({countTasks})
 
   return (
     isWidthBelowMinimum ? <TooSmall /> :
-
     <div id="container">
 
       <AddTaskForm handleClick_addTask={handleClick_addTask} />
@@ -309,7 +310,6 @@ Verbindung zur Datenbank
               consoleLogText = "inProgressAnkerRightPos"
               break;
           }
-          // console.log("SwitchCase: " +consoleLogText)
           return (
             <div
               id={task.id}
@@ -320,6 +320,7 @@ Verbindung zur Datenbank
               onDragEnd={event => { setNewPosition(event, task.id) }}
               onMouseDown={event => taskClicked(event, task.id)}
               style={{ left: leftPos, top: task.posY }}
+
             >
               <div className="task-header">
                 <div className="task-header-left">
@@ -335,14 +336,14 @@ Verbindung zur Datenbank
                 </div>
                 <div className="task-header-right">
                   <div className="descriptionPreview">
-                    asdf ädgdf ijasdfgiadjf göadjfgö oijadf gadöofgi jdafg odfijgh öoadgjf öodalidfjg öadofidjg adoöfidf adfuhg adf gö
+                  Lorem ipsum dolor sit amet, consectetur adipisici elit, …
                   </div>
                 </div>
                 
                 <span className="details-expand-btn" onClick={() => detail_toggle(`details_${task.id}`, task.id)} onDrag={event => dragging(event, task.id)}>↕</span>
               </div>
               <div className={`task-Details`} id={`details_${task.id}`}>
-                Definition of Done:
+                <span className="dod-title">Definition of Done:</span>
                   
                 <DODList dod={task.dod} />
                     

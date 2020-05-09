@@ -118,6 +118,7 @@ cursor: pointer;
 .form_d-o-d-title{
   margin-bottom: .3em;
   display: block;
+  text-align: center;
 }
 .form_d-o-d-list{
   line-height: 1.65em;

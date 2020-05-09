@@ -5,9 +5,12 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 
+import Firefox from "./Firefox"
+
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    {navigator.userAgent.indexOf("Firefox") != -1  ? <Firefox /> : 
+    <App />}
   </React.StrictMode>,
   document.getElementById('root')
 );
